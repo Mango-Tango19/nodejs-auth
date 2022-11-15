@@ -1,4 +1,5 @@
 const express = require("express");
+require("dotenv").config();
 const app = express();
 const path = require("path");
 const { logger } = require("./middleware/logger");
@@ -11,6 +12,8 @@ const PORT = process.env.PORT || 3500;
 app.use(logger);
 
 app.use(cors(corsOptions));
+
+console.log(process.env.NODE_ENV);
 
 //ability to recieve and send json
 app.use(express.json());
