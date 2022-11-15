@@ -7,13 +7,16 @@ const errorHandler = require("./middleware/errorHandler");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const corsOptions = require("./config/corsOptions");
+const connectDB = require("./config/dbConn");
+const mongoose = require("mongoose");
+const { logEvents } = require("./middleware/logger");
 const PORT = process.env.PORT || 3500;
 
+console.log(process.env.NODE_ENV);
+connectDB();
 app.use(logger);
 
 app.use(cors(corsOptions));
-
-console.log(process.env.NODE_ENV);
 
 //ability to recieve and send json
 app.use(express.json());
@@ -37,6 +40,14 @@ app.all("*", (req, res) => {
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-	console.log(`Server running at port ${PORT}`);
+mongoose.connection.once("open", () => {
+	console.log("Connect to Mongo DB");
+	app.listen(PORT, () => {
+		console.log(`Server running at port ${PORT}`);
+	});
+});
+
+mongoose.connection.on("error", (err) => {
+	console.log(err);
+	logEvents(`${err.no}: ${err.code}\t ${err.hostname}}`, "mongoErr.log");
 });
