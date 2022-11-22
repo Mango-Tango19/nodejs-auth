@@ -4,7 +4,14 @@ const Notes = require("../models/Notes");
 const bcrypt = require("bcrypt");
 
 ///get all users, GET /users, make private
-const getAllUsers = asyncHandler(async (req, res) => {});
+const getAllUsers = asyncHandler(async (req, res) => {
+	const users = await User.find().select("-password").lean();
+
+	if (!users) {
+		res.status(400).json({ message: "No users found" });
+	}
+	res.json(users);
+});
 
 /// POST /users, make private
 const createNewUser = asyncHandler(async (req, res) => {
