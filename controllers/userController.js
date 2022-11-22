@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const getAllUsers = asyncHandler(async (req, res) => {
 	const users = await User.find().select("-password").lean();
 
-	if (!users) {
+	if (!users?.length) {
 		res.status(400).json({ message: "No users found" });
 	}
 	res.json(users);
@@ -17,7 +17,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 const createNewUser = asyncHandler(async (req, res) => {
 	const { username, password, roles } = req.body;
 
-	if (!username || !password || !roles.isArray()) {
+	if (!username || !password || !Array.isArray(roles) || !roles.length) {
 		res.status(400).json({ message: "All fields are required" });
 	}
 
@@ -37,7 +37,9 @@ const createNewUser = asyncHandler(async (req, res) => {
 
 	if (user) {
 		///created
-		res.status(201).json({ message: "New user created" });
+		res.status(201).json({
+			message: `New user ${userObj.username} is created`,
+		});
 	} else {
 		res.status(400).json({ message: "Invalid user data recieved" });
 	}
@@ -73,11 +75,11 @@ const updateUser = asyncHandler(async (req, res) => {
 	const { id, username, password, roles, active } = req.body;
 
 	if (
-		!username ||
-		!password ||
-		!Array.isArray(roles) ||
 		!id ||
-		typeof active !== "boolean"
+		!username ||
+		!Array.isArray(roles) ||
+		typeof active !== "boolean" ||
+		!roles.length
 	) {
 		res.status(400).json({ message: "All fields are required" });
 	}
@@ -88,10 +90,10 @@ const updateUser = asyncHandler(async (req, res) => {
 		res.status(400).json({ message: "User not found" });
 	}
 
-	const duplicate = User.findOne({ username }).lean().exec();
+	const duplicate = await User.findOne({ username }).lean().exec();
 
 	//avoid change the current user working with
-	if (duplicate && duplicate?.id !== id) {
+	if (duplicate && duplicate?._id.toString() !== id) {
 		res.status(409).json({ message: "Duplicate username" });
 	}
 
@@ -105,7 +107,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
 	const updatedUser = await user.save();
 
-	res.json({ message: "User was updated" });
+	res.json({ message: `User ${updatedUser.username} was updated` });
 });
 
 module.exports = {
