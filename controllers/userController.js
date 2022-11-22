@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const getAllUsers = asyncHandler(async (req, res) => {});
 
 /// POST /users, make private
-const postNewUser = asyncHandler(async (req, res) => {
+const createNewUser = asyncHandler(async (req, res) => {
 	const { username, password, roles } = req.body;
 
 	if (!username || !password || !roles.isArray()) {
@@ -37,7 +37,29 @@ const postNewUser = asyncHandler(async (req, res) => {
 });
 
 /// DELETE /users, make private
-const deleteUser = asyncHandler(async (req, res) => {});
+const deleteUser = asyncHandler(async (req, res) => {
+	const { id } = req.body;
+
+	if (!id) {
+		res.status(400).json({ message: "User id is required" });
+	}
+
+	const notes = await Notes.findOne({ user: id }).lean().exec();
+
+	if (notes?.length) {
+		res.status(400).json({ message: `User has assigned notes` });
+	}
+
+	const user = await User.findOne(id).lean().exec();
+
+	if (!user) {
+		res.status(400).json({ message: "User wasnt found" });
+	}
+
+	const result = await user.deleteOne();
+
+	res.json({ message: `User ${result.username} was deleted` });
+});
 
 /// UPDATE /users, make private
 const updateUser = asyncHandler(async (req, res) => {
@@ -79,4 +101,9 @@ const updateUser = asyncHandler(async (req, res) => {
 	res.json({ message: "User was updated" });
 });
 
-module.exports = userController;
+module.exports = {
+	getAllUsers,
+	createNewUser,
+	updateUser,
+	deleteUser,
+};

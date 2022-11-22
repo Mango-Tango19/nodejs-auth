@@ -6,7 +6,7 @@ router
 	.route("/")
 	.get(userController.getAllUsers)
 	.patch(userController.updateUser)
-	.post(userController.postNewUser)
+	.post(userController.createNewUser)
 	.delete(userController.deleteUser);
 
 module.exports = router;
