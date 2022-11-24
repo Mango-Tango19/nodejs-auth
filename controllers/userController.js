@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/Users");
-const Notes = require("../models/Notes");
+const Note = require("../models/Notes");
 const bcrypt = require("bcrypt");
 
 ///get all users, GET /users, make private
@@ -53,13 +53,13 @@ const deleteUser = asyncHandler(async (req, res) => {
 		res.status(400).json({ message: "User id is required" });
 	}
 
-	const notes = await Notes.findOne({ user: id }).lean().exec();
+	const note = await Note.findOne({ user: id }).lean().exec();
 
-	if (notes?.length) {
+	if (note) {
 		res.status(400).json({ message: `User has assigned notes` });
 	}
 
-	const user = await User.findOne(id).lean().exec();
+	const user = await User.findById(id).lean().exec();
 
 	if (!user) {
 		res.status(400).json({ message: "User wasnt found" });
