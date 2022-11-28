@@ -5,7 +5,7 @@ const noteController = require("../controllers/noteController");
 router
 	.route("/")
 	.get(noteController.getAllNotes)
-	.post(noteController.postNote)
+	.post(noteController.createNewNote)
 	.patch(noteController.updateNote)
 	.delete(noteController.deleteNote);
 
