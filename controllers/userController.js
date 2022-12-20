@@ -59,7 +59,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 		res.status(400).json({ message: `User has assigned notes` });
 	}
 
-	const user = await User.findById(id).lean().exec();
+	const user = await User.findById(id).exec();
 
 	if (!user) {
 		res.status(400).json({ message: "User wasnt found" });
@@ -67,7 +67,9 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 	const result = await user.deleteOne();
 
-	res.json({ message: `User ${result.username} was deleted` });
+	const reply = `Username ${result.username} with ID ${result._id} deleted`;
+
+	res.json(reply);
 });
 
 /// UPDATE /users, make private

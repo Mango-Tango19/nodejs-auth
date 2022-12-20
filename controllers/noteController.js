@@ -4,7 +4,7 @@ const Note = require("../models/Notes");
 
 const getAllNotes = asyncHandler(async (req, res) => {
 	const notes = await Note.find().lean();
-	if (!notes.length) {
+	if (!notes?.length) {
 		res.status(400).json({ message: "No notes found" });
 	}
 
@@ -20,6 +20,8 @@ const getAllNotes = asyncHandler(async (req, res) => {
 
 const createNewNote = asyncHandler(async (req, res) => {
 	const { user, title, text } = req.body;
+
+	console.log(user);
 
 	if (!user || !title || !text) {
 		res.status(400).json({ message: "User, title and text are required" });
