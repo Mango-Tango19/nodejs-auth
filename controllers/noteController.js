@@ -30,7 +30,7 @@ const createNewNote = asyncHandler(async (req, res) => {
 	//check for duplicates
 	const duplicate = await Note.findOne({ title }).lean().exec();
 
-	if (!duplicate) {
+	if (duplicate) {
 		res.status(409).json({
 			message: `Note with title ${title} is already exist`,
 		});
